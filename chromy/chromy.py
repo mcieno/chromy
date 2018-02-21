@@ -110,48 +110,54 @@ class Chromy(Chrome):
             return True
 
 
-    def send_keys_to_xpath(self, keys, xpath):
+    def send_keys_to_xpath(self, keys, xpath, esc=True):
         """Send keys to element specified by xpath.
 
         Positional arguments:
         keys -- keys to be sent.
         xpath -- xpath representing the element.
+        esc -- if True press ESCAPE after sending keys (default True).
         """
         try:
             self.find_element_by_xpath(xpath).send_keys(keys)
-            self.press_esc()
+            if esc is True:
+                self.press_esc()
         except:
             return False
         self.rest()
         return True
 
 
-    def send_keys_to_link_text(self, keys, link_text):
+    def send_keys_to_link_text(self, keys, link_text, esc=True):
         """Send keys to hyperlink by its text.
 
         Positional arguments:
         keys -- keys to be sent.
         link_text -- text of the hyperlink to click.
+        esc -- if True press ESCAPE after sending keys (default True).
         """
         try:
             self.find_element_by_link_text(link_text).send_keys(keys)
-            self.press_esc()
+            if esc is True:
+                self.press_esc()
         except:
             return False
         self.rest()
         return True
 
 
-    def send_keys_to_class_name(self, keys, class_name):
+    def send_keys_to_class_name(self, keys, class_name, esc=True):
         """Send keys to element with specified class name.
 
         Positional arguments:
         keys -- keys to be sent.
         class_name -- class name of the element to click.
+        esc -- if True press ESCAPE after sending keys (default True).
         """
         try:
             self.find_element_by_class_name(class_name).send_keys(keys)
-            self.press_esc()
+            if esc is True:
+                self.press_esc()
         except:
             return False
         self.rest()
