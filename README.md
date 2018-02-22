@@ -1,4 +1,7 @@
 # Chromy
+
+[![forthebadge](https://forthebadge.com/images/badges/made-with-python.svg)](https://forthebadge.com)
+
 Easy-to-use Selenium Chromedriver. *Requires chromedriver.exe* in the same
 folder of the script importing Chromy.
 
