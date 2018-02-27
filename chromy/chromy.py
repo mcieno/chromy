@@ -1,27 +1,26 @@
-"""
-:Date: 2017-02-17
-:Version: 1.1
-:Authors:
-    - Marco Cieno
-"""
 import os
 import time
 import pandas as pd
+from selenium.common.exceptions import NoAlertPresentException
+from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import NoSuchWindowException
 from selenium.webdriver import Chrome
 from selenium.webdriver import ChromeOptions
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.keys import Keys
 
 
 class Chromy(Chrome):
-    """This class adds feautures to selenium.webdriver.Chrome."""
+    """Extend selenium.webdriver.Chrome feautures."""
 
     def __init__(self, download_path=False, implicit_wait=0.1):
-        """Create Chromy object and starts chromedriver.exe.
+        """Create Chromy and start chromedriver.exe.
 
-        Keyword arguments:
-        download_path -- relative path to chromedriver.exe download folder (default False).
-        implicit_wait -- implicit time wait for each operation (default 0.1).
+        Args:
+            download_path: Relative path to chromedriver.exe download folder
+                (default False).
+            implicit_wait: Implicit time, in seconds, wait after each operation
+                (default 0.1).
         """
         co = ChromeOptions()
         co.add_argument('--log-level=3')
@@ -42,171 +41,186 @@ class Chromy(Chrome):
                 })
         super().__init__(chrome_options=co)
         self.download_path = download_path
-        self.implicit_wait = max(0, implicit_wait)
+        self.implicit_wait = max(.0, implicit_wait)
         self.rest()
 
-
     def click_element_by_xpath(self, xpath):
-        """Click on the element with specified xpath.
+        """Click on the element with specified XPATH.
 
-        Positional arguments:
-        xpath -- xpath representing the element to click.
+        Args:
+            xpath: XPATH representing the element to click.
+
+        Returns:
+            True on success, False on fail.
         """
         try:
             self.find_element_by_xpath(xpath).click()
-        except:
+        except NoSuchElementException:
             return False
         self.rest()
         return True
-
 
     def click_element_by_link_text(self, link_text, new_tab=False):
         """Click on hyperlink by its text.
 
-        Positional arguments:
-        link_text -- text of the hyperlink to click.
+        Args:
+            link_text: Text of the hyperlink to click.
+            new_tab: If True open the link in a new tab (default False).
 
-        Keyword arguments:
-        new_tab -- open the link in a new tab (default False).
+        Returns:
+            True on success, False on fail.
         """
         try:
             if new_tab is True:
+                href = self.find_element_by_link_text(link_text)\
+                    .get_attribute('href')
                 self.new_tab()
-                self.get(self.find_element_by_link_text(link_text).get_attribute('href'))
+                self.get(href)
             else:
                 self.find_element_by_link_text(link_text).click()
-        except:
+        except NoSuchElementException:
             return False
         self.rest()
         return True
-
 
     def click_element_by_class_name(self, class_name):
         """Click on element with specified class name.
 
-        Positional arguments:
-        class_name - class name of the element to click.
+        Args:
+            class_name: Class name of the element to click.
+
+        Returns:
+            True on success, False on fail.
         """
         try:
             self.find_element_by_class_name(class_name).click()
-        except:
+        except NoSuchElementException:
             return False
         self.rest()
         return True
-
 
     def js_click_radio(self, value):
         """Safely click on radio buttons with JavaScript.
 
-        Positional arguments:
-        value -- value of radio button to click.
+        Args:
+            value: Value of radio button to click.
+
+        Returns:
+            True on success, False on fail.
         """
         try:
-            radio = self.find_element_by_xpath('//input[@type="radio" and @value="{}"]'.format(value))
+            radio = self.find_element_by_xpath(
+                '//input[@type="radio" and @value="{}"]'.format(value)
+            )
             self.execute_script('arguments[0].click();', radio)
-        except:
+        except NoSuchElementException:
             return False
-            self.rest()
-            return True
+        self.rest()
+        return True
 
+    def send_keys_to_xpath(self, keys, xpath, escape=True):
+        """Send keys to element specified by XPATH.
 
-    def send_keys_to_xpath(self, keys, xpath, esc=True):
-        """Send keys to element specified by xpath.
+        Args:
+            keys: Keys to be sent.
+            xpath: XPATH representing the element.
+            escape: If True press ESCAPE after sending keys (default True).
 
-        Positional arguments:
-        keys -- keys to be sent.
-        xpath -- xpath representing the element.
-        esc -- if True press ESCAPE after sending keys (default True).
+        Returns:
+            True on success, False on fail.
         """
         try:
             self.find_element_by_xpath(xpath).send_keys(keys)
-            if esc is True:
-                self.press_esc()
-        except:
+            if escape is True:
+                self.press_escape()
+        except NoSuchElementException:
             return False
         self.rest()
         return True
 
-
-    def send_keys_to_link_text(self, keys, link_text, esc=True):
+    def send_keys_to_link_text(self, keys, link_text, escape=True):
         """Send keys to hyperlink by its text.
 
-        Positional arguments:
-        keys -- keys to be sent.
-        link_text -- text of the hyperlink to click.
-        esc -- if True press ESCAPE after sending keys (default True).
+        Args:
+            keys: Keys to be sent.
+            link_text: Text of the hyperlink to click.
+            escape: If True press ESCAPE after sending keys (default True).
+
+        Returns:
+            True on success, False on fail.
         """
         try:
             self.find_element_by_link_text(link_text).send_keys(keys)
-            if esc is True:
-                self.press_esc()
-        except:
+            if escape is True:
+                self.press_escape()
+        except NoSuchElementException:
             return False
         self.rest()
         return True
 
-
-    def send_keys_to_class_name(self, keys, class_name, esc=True):
+    def send_keys_to_class_name(self, keys, class_name, escape=True):
         """Send keys to element with specified class name.
 
-        Positional arguments:
-        keys -- keys to be sent.
-        class_name -- class name of the element to click.
-        esc -- if True press ESCAPE after sending keys (default True).
+        Args:
+            keys: Keys to be sent.
+            class_name: Class name of the element to click.
+            escape: If True press ESCAPE after sending keys (default True).
+
+        Returns:
+            True on success, False on fail.
         """
         try:
             self.find_element_by_class_name(class_name).send_keys(keys)
-            if esc is True:
-                self.press_esc()
-        except:
+            if escape is True:
+                self.press_escape()
+        except NoSuchElementException:
             return False
         self.rest()
         return True
 
-
     def accept_alert(self):
-        """Accept alert pop up."""
+        """Accept alert pop up.
+
+        Returns:
+            True on success, False on fail.
+        """
         try:
-            self.switch_to_alert().accept();
+            self.switch_to.alert.accept()
             self.rest()
-        except:
+        except NoAlertPresentException:
             return False
         return True
-
 
     def dismiss_alert(self):
-        """Dismiss alert pop up."""
+        """Dismiss alert pop up.
+
+        Returns:
+            True on success, False on fail.
+        """
         try:
-            self.switch_to_alert().dismiss();
+            self.switch_to.alert.dismiss()
             self.rest()
-        except:
+        except NoAlertPresentException:
             return False
         return True
-
-
-    def rest(self, rest_time=0):
-        """Freeze execution for at least self.implicit_wait seconds.
-
-        Keyword arguments:
-        rest_time -- time to freeze execution (default 0).
-        """
-        time.sleep(max(rest_time, self.implicit_wait))
-
 
     def switch_to_window(self, window):
         """Switch to another tab by its index or handle.
 
-        Positional arguments:
-        window -- index of desired window handle or window handle.
+        Args:
+            window: Index of desired window handle or window handle name.
+
+        Returns:
+            True on success, False on fail.
         """
         try:
             if isinstance(window, int):
                 if window < 0 or window >= len(self.window_handles):
-                    raise Exception()
-                self.switch_to_window(self.window_handles[window])
+                    return False
+                self.switch_to.window(self.window_handles[window])
             else:
-                super().switch_to_window(window)
-        except:
+                super().switch_to.window(window)
+        except NoSuchWindowException:
             return False
         self.rest()
         return True
@@ -214,8 +228,11 @@ class Chromy(Chrome):
     def new_tab(self, switch=True):
         """Open new window.
 
-        Keyword arguments:
-        switch -- set focus to newly opened tab.
+        Args:
+            switch: If True set focus to newly opened tab (default True).
+
+        Returns:
+            True on success, False on fail.
         """
         try:
             wh_before = set(self.window_handles)
@@ -223,61 +240,87 @@ class Chromy(Chrome):
             new_window = list(set(self.window_handles) - wh_before)
             if switch is True:
                 self.switch_to_window(new_window[0])
-        except:
+        except NoSuchWindowException:
             return False
         self.rest()
         return True
 
-
     def close_tab(self):
         """Close tab if at least 2 tabs exists and focus
         on previous tab, if any; on next tab otherwise.
+
+        Returns:
+            True on success, False on fail.
         """
         try:
             if len(self.window_handles) > 1:
-                current_window = sum(i for i, v in enumerate(self.window_handles) if v == self.current_window_handle)
+                current_window = self.window_handles.index(
+                    self.current_window_handle
+                )
                 self.close()
                 self.switch_to_window(max(0, current_window - 1))
                 self.rest()
                 return True
-        except:
-            pass
-        return False
-
+        except NoSuchWindowException:
+            return False
+        self.rest()
+        return True
 
     def next_tab(self):
-        """Switch to next tab, if any."""
-        current_window = sum(i for i, v in enumerate(self.window_handles) if v == self.current_window_handle)
+        """Switch to next tab, if any.
+
+        Returns:
+            True on success, False on fail.
+        """
+        current_window = self.window_handles.index(
+            self.current_window_handle
+        )
         return self.switch_to_window(current_window + 1)
 
-
     def prev_tab(self):
-        """Switch to previous tab, if any."""
-        current_window = sum(i for i, v in enumerate(self.window_handles) if v == self.current_window_handle)
+        """Switch to previous tab, if any.
+
+        Returns:
+            True on success, False on fail.
+        """
+        current_window = self.window_handles.index(
+            self.current_window_handle
+        )
         return self.switch_to_window(current_window - 1)
 
-
-    def press_esc(self):
-        """Simulate ESC keypress."""
+    def press_escape(self):
+        """Simulate ESCAPE keypress."""
         ActionChains(self).key_down(Keys.ESCAPE).key_up(Keys.ESCAPE).perform()
 
-    def list_radios(include_disabled=False):
+    def list_radios(self, include_disabled=False):
         """Create a list of all radio elements in the page.
 
-        Keyword arguments:
-        include_disabled -- include disabled radios in the list.
+        Args:
+            include_disabled: If True include disabled radios in the list (default
+                False).
+
+        Returns:
+            A list of radio elements.
         """
-        try:
-            t = self.find_elements_by_xpath('//input[@type="radio"]')
-        except:
-            t = []
+        t = self.find_elements_by_xpath('//input[@type="radio"]')
         return [x for x in t if include_disabled is True or x.is_enabled()]
 
-
     def list_tables(self):
-        """Return a list of all tables in the page as pandas DataFrame."""
+        """Create a list all the tables in the page.
+
+        Returns:
+            A list of all tables in the page as pandas DataFrame objects.
+        """
         try:
             t = pd.read_html(self.page_source)
-        except:
+        except ValueError:
             t = []
         return t
+
+    def rest(self, rest_time=.0):
+        """Freeze execution for at least self.implicit_wait seconds.
+
+        Args:
+            rest_time: time to freeze execution (default .0).
+        """
+        time.sleep(max(rest_time, self.implicit_wait))
