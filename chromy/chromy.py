@@ -1,13 +1,15 @@
 import os
 import time
 import pandas as pd
+import logging
 from selenium.common.exceptions import NoAlertPresentException
-from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import NoSuchWindowException
 from selenium.webdriver import Chrome
 from selenium.webdriver import ChromeOptions
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.remote.remote_connection import LOGGER
+LOGGER.setLevel(logging.WARNING)
 
 
 class Chromy(Chrome):
@@ -49,16 +51,9 @@ class Chromy(Chrome):
 
         Args:
             xpath: XPATH representing the element to click.
-
-        Returns:
-            True on success, False on fail.
         """
-        try:
-            self.find_element_by_xpath(xpath).click()
-        except NoSuchElementException:
-            return False
+        self.find_element_by_xpath(xpath).click()
         self.rest()
-        return True
 
     def click_element_by_link_text(self, link_text, new_tab=False):
         """Click on hyperlink by its text.
@@ -66,57 +61,36 @@ class Chromy(Chrome):
         Args:
             link_text: Text of the hyperlink to click.
             new_tab: If True open the link in a new tab (default False).
-
-        Returns:
-            True on success, False on fail.
         """
-        try:
-            if new_tab is True:
-                href = self.find_element_by_link_text(link_text)\
-                    .get_attribute('href')
-                self.new_tab()
-                self.get(href)
-            else:
-                self.find_element_by_link_text(link_text).click()
-        except NoSuchElementException:
-            return False
+        if new_tab is True:
+            href = self.find_element_by_link_text(link_text)\
+                .get_attribute('href')
+            self.new_tab()
+            self.get(href)
+        else:
+            self.find_element_by_link_text(link_text).click()
         self.rest()
-        return True
 
     def click_element_by_class_name(self, class_name):
         """Click on element with specified class name.
 
         Args:
             class_name: Class name of the element to click.
-
-        Returns:
-            True on success, False on fail.
         """
-        try:
-            self.find_element_by_class_name(class_name).click()
-        except NoSuchElementException:
-            return False
+        self.find_element_by_class_name(class_name).click()
         self.rest()
-        return True
 
     def js_click_radio(self, value):
         """Safely click on radio buttons with JavaScript.
 
         Args:
             value: Value of radio button to click.
-
-        Returns:
-            True on success, False on fail.
         """
-        try:
-            radio = self.find_element_by_xpath(
-                '//input[@type="radio" and @value="{}"]'.format(value)
-            )
-            self.execute_script('arguments[0].click();', radio)
-        except NoSuchElementException:
-            return False
+        radio = self.find_element_by_xpath(
+            '//input[@type="radio" and @value="{}"]'.format(value)
+        )
+        self.execute_script('arguments[0].click();', radio)
         self.rest()
-        return True
 
     def send_keys_to_xpath(self, keys, xpath, escape=True):
         """Send keys to element specified by XPATH.
@@ -125,18 +99,11 @@ class Chromy(Chrome):
             keys: Keys to be sent.
             xpath: XPATH representing the element.
             escape: If True press ESCAPE after sending keys (default True).
-
-        Returns:
-            True on success, False on fail.
         """
-        try:
-            self.find_element_by_xpath(xpath).send_keys(keys)
-            if escape is True:
-                self.press_escape()
-        except NoSuchElementException:
-            return False
+        self.find_element_by_xpath(xpath).send_keys(keys)
+        if escape is True:
+            self.press_escape()
         self.rest()
-        return True
 
     def send_keys_to_link_text(self, keys, link_text, escape=True):
         """Send keys to hyperlink by its text.
@@ -145,18 +112,11 @@ class Chromy(Chrome):
             keys: Keys to be sent.
             link_text: Text of the hyperlink to click.
             escape: If True press ESCAPE after sending keys (default True).
-
-        Returns:
-            True on success, False on fail.
         """
-        try:
-            self.find_element_by_link_text(link_text).send_keys(keys)
-            if escape is True:
-                self.press_escape()
-        except NoSuchElementException:
-            return False
+        self.find_element_by_link_text(link_text).send_keys(keys)
+        if escape is True:
+            self.press_escape()
         self.rest()
-        return True
 
     def send_keys_to_class_name(self, keys, class_name, escape=True):
         """Send keys to element with specified class name.
@@ -165,18 +125,11 @@ class Chromy(Chrome):
             keys: Keys to be sent.
             class_name: Class name of the element to click.
             escape: If True press ESCAPE after sending keys (default True).
-
-        Returns:
-            True on success, False on fail.
         """
-        try:
-            self.find_element_by_class_name(class_name).send_keys(keys)
-            if escape is True:
-                self.press_escape()
-        except NoSuchElementException:
-            return False
+        self.find_element_by_class_name(class_name).send_keys(keys)
+        if escape is True:
+            self.press_escape()
         self.rest()
-        return True
 
     def accept_alert(self):
         """Accept alert pop up.
@@ -317,10 +270,10 @@ class Chromy(Chrome):
             t = []
         return t
 
-    def rest(self, rest_time=.0):
+    def rest(self, rest_time=.1):
         """Freeze execution for at least self.implicit_wait seconds.
 
         Args:
-            rest_time: time to freeze execution (default .0).
+            rest_time: time to freeze execution (default 0.1).
         """
         time.sleep(max(rest_time, self.implicit_wait))
