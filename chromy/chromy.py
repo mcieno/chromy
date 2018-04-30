@@ -1,7 +1,8 @@
-import os
-import time
-import pandas as pd
+import colorama
 import logging
+import os
+import pandas as pd
+import time
 from selenium.common.exceptions import NoAlertPresentException
 from selenium.common.exceptions import NoSuchWindowException
 from selenium.webdriver import Chrome
@@ -24,6 +25,7 @@ class Chromy(Chrome):
             implicit_wait: Implicit time, in seconds, wait after each operation
                 (default 0.1).
         """
+        colorama.init()
         co = ChromeOptions()
         co.add_argument('--log-level=3')
         co.add_argument('--disable-application-cache')
@@ -277,3 +279,38 @@ class Chromy(Chrome):
             rest_time: time to freeze execution (default 0.1).
         """
         time.sleep(max(rest_time, self.implicit_wait))
+
+    def printc(self, *args, **kwargs):
+        COLORCODES = {
+            '+':        ('[+]', colorama.Fore.GREEN + colorama.Style.BRIGHT),
+            'G':        ('[+]', colorama.Fore.GREEN + colorama.Style.BRIGHT),
+            'GREEN':    ('[+]', colorama.Fore.GREEN + colorama.Style.BRIGHT),
+
+            '?':        ('[?]', colorama.Fore.YELLOW + colorama.Style.BRIGHT),
+            'Y':        ('[?]', colorama.Fore.YELLOW + colorama.Style.BRIGHT),
+            'YELLOW':   ('[?]', colorama.Fore.YELLOW + colorama.Style.BRIGHT),
+
+            '*':        ('[*]', colorama.Fore.MAGENTA + colorama.Style.BRIGHT),
+            'M':        ('[*]', colorama.Fore.MAGENTA + colorama.Style.BRIGHT),
+            'MAGENTA':  ('[*]', colorama.Fore.MAGENTA + colorama.Style.BRIGHT),
+
+            '-':        ('[-]', colorama.Fore.RED + colorama.Style.BRIGHT),
+            'R':        ('[-]', colorama.Fore.RED + colorama.Style.BRIGHT),
+            'RED':      ('[-]', colorama.Fore.RED + colorama.Style.BRIGHT),
+
+            '!':        ('[!]', colorama.Back.RED + colorama.Fore.WHITE + colorama.Style.BRIGHT),
+            'F':        ('[!]', colorama.Back.RED + colorama.Fore.WHITE + colorama.Style.BRIGHT),
+            'FATAL':    ('[!]', colorama.Back.RED + colorama.Fore.WHITE + colorama.Style.BRIGHT),
+
+            'RESET': colorama.Style.RESET_ALL + colorama.Style.BRIGHT
+        }
+
+        if 'c' in kwargs.keys():
+            if kwargs['c'] in COLORCODES.keys()
+                color = COLORCODES[kwargs['c']]
+            del(kwargs['c'])
+        else:
+            color = COLORCODES['GREEN']
+
+        print(color[1] + color[0] + COLORCODES['RESET'], end=' ')
+        print(*args, **kwargs)
