@@ -306,7 +306,7 @@ class Chromy(Chrome):
         }
 
         if 'c' in kwargs.keys():
-            if kwargs['c'] in COLORCODES.keys()
+            if kwargs['c'] in COLORCODES.keys():
                 color = COLORCODES[kwargs['c']]
             del(kwargs['c'])
         else:
