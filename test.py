@@ -21,23 +21,25 @@ def main():
         chrome.quit()
         raise RuntimeError(err)
 
-    if chrome.send_keys_to_xpath('chromy github', '//input[@name="q"]'):
+    try:
+        chrome.send_keys_to_xpath('chromy github', '//input[@name="q"]'):
         sys.stdout.write('Successfully sent keys to input form.\n')
-    else:
+    except:
         err = 'Unable to send keys to input form.\n'
         sys.stderr.write(err)
         chrome.quit()
         raise RuntimeError(err)
 
-    if chrome.click_element_by_xpath('//input[@name="btnK"]'):
+    try:
+        chrome.click_element_by_xpath('//input[@name="btnK"]'):
         sys.stdout.write('Successfully clicked on search button.\n')
-    else:
+    except:
         err = 'Unable to click on search button.\n'
         sys.stderr.write(err)
         chrome.quit()
         raise RuntimeError(err)
 
-    sys.stdout.write('\nTest successfully completed.\n')
+    chrome.printc('\nTest successfully completed.\n')
     chrome.quit()
 
 
