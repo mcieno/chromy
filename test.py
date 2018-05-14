@@ -1,7 +1,8 @@
-def main():
-    import sys
-    from chromy import Chromy
+import sys
+from chromy import Chromy
 
+
+def main():
     try:
         chrome = Chromy(implicit_wait=3)
         sys.stdout.write('Successfully created Chromy.\n')
