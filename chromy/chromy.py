@@ -322,5 +322,7 @@ class Chromy(Chrome):
                 stream = sys.stdout        
             del(kwargs['stream'])
 
-        stream.write(color[1] + color[0] + COLORCODES['RESET'] + ' ')
-        stream.write(*args, **kwargs)
+        args = args[1:]
+        
+        print(color[1] + color[0] + COLORCODES['RESET'], end=' ', file=stream)
+        print(*args, **kwargs, file=stream)
