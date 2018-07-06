@@ -33,7 +33,7 @@ class Chromy(Chrome):
         co.add_argument('disable-infobars')
         if download_path is not False:
             if download_path is None:
-                download_path = os.getcwd() + '\\downloads\\'
+                download_path = os.getcwd() + '/downloads/'
             if not os.path.exists(download_path):
                 os.makedirs(download_path)
             co.add_experimental_option('prefs', {
@@ -319,10 +319,8 @@ class Chromy(Chrome):
         stream = sys.stderr
         if 'stream' in kwargs.keys():
             if kwargs['stream'].lower() == 'stdout':
-                stream = sys.stdout        
+                stream = sys.stdout
             del(kwargs['stream'])
 
-        args = args[1:]
-        
-        print(color[1] + color[0] + COLORCODES['RESET'], end=' ', file=stream)
-        print(*args, **kwargs, file=stream)
+        stream.write(color[1] + color[0] + COLORCODES['RESET'] + ' ')
+        stream.write(args[1] + '\n', **kwargs)
