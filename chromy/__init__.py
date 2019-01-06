@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import pandas
+import selenium
 import sys
 import time
 
