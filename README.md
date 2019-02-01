@@ -31,7 +31,7 @@ Depending on your operating system unpack the correct ZIP file and add chromedri
 
 In linux this may look like:
 ```sh
-$ 7z x chromedriver_linux64.zip
+$ unzip chromedriver_linux64.zip
 $ PATH=$(pwd):$PATH
 ```
 **Note:** the above changes to `PATH` are not persistent.
