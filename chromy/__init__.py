@@ -22,6 +22,7 @@ except ImportError:
     log = logging.getLogger()
     log.removeHandler(log.handlers[0])
     log.addHandler(handler)
+    # Aliasing function names
     log.log = log.info
     log.success = log.info
     log.warning = log.debug
